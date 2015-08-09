@@ -1,16 +1,17 @@
 package it.jaschke.alexandria;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -26,8 +27,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     private ListView bookList;
     private int position = ListView.INVALID_POSITION;
     private EditText searchText;
-
-    private final int LOADER_ID = 10;
 
     public ListOfBooks() {
     }
@@ -68,6 +67,15 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                /** @fnp close they keyboard (if its open) when navigating to a new fragment */
+                if(getActivity().getCurrentFocus() != null) {
+                    InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+                }
+
                 Cursor cursor = bookListAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
                     ((Callback)getActivity())
@@ -80,7 +88,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     }
 
     private void restartLoader(){
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
+        getLoaderManager().restartLoader(MainActivity.LOADER_LIST, null, this);
     }
 
     @Override

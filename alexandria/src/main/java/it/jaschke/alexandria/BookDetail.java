@@ -26,7 +26,6 @@ import it.jaschke.alexandria.services.DownloadImage;
 public class BookDetail extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String EAN_KEY = "EAN";
-    private final int LOADER_ID = 10;
     private View rootView;
     private String ean;
     private String bookTitle;
@@ -48,7 +47,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         Bundle arguments = getArguments();
         if (arguments != null) {
             ean = arguments.getString(BookDetail.EAN_KEY);
-            getLoaderManager().restartLoader(LOADER_ID, null, this);
+            getLoaderManager().restartLoader(MainActivity.LOADER_DETAILS, null, this);
         }
 
         rootView = inflater.inflate(R.layout.fragment_full_book, container, false);

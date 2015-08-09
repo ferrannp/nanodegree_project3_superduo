@@ -4,8 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -15,6 +18,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import it.jaschke.alexandria.api.Callback;
@@ -37,6 +41,19 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
 
+    /**
+     * @fnp unique identifiers for the loaders
+     */
+    public static final int LOADER_LIST = 1;
+    public static final int LOADER_DETAILS = 2;
+
+    /**
+     * @fnp
+     * Remember the title of the fragment so on activity destroy {@link #restoreActionBar()}
+     * will use the correct one
+     */
+    private static final String STATE_TITLE = "title_fragment";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +74,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         // Set up the drawer.
         navigationDrawerFragment.setUp(R.id.navigation_drawer,
-                    (DrawerLayout) findViewById(R.id.drawer_layout));
+                (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
     @Override
@@ -80,14 +97,59 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         }
 
+        /** @fnp close they keyboard (if its open) when navigating to a new fragment */
+        if(getCurrentFocus() != null) {
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+
         fragmentManager.beginTransaction()
                 .replace(R.id.container, nextFragment)
-                .addToBackStack((String) title)
+                /**
+                 * @fnp Adding the options (fragments) to the back stack is not a good
+                 * pattern (we could create a big stack here), moreover, when user hits back,
+                 * fragment is the correct one but the selected option and the action bar title
+                 * are inconsistent
+                 *
+                 * @see {@link #onBackPressed} for more extended solution
+                 **/
+                //.addToBackStack((String) title)
                 .commit();
+    }
+
+    /** @fnp we don't take the title for the ActionBar because navigationDrawer could be open and
+     * then title would be "Alexandria" which would be wrong
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        switch (navigationDrawerFragment.getSelectedPosition()){
+            case 0: //List of books
+                outState.putString(STATE_TITLE, getString(R.string.books));
+                break;
+            case 1: //Add/Scan book
+                outState.putString(STATE_TITLE, getString(R.string.scan));
+                break;
+            case 2: //About
+                outState.putString(STATE_TITLE, getString(R.string.about));
+                break;
+        }
+    }
+
+    @Override
+    public void onRestoreInstanceState(@NonNull Bundle outState) {
+        super.onRestoreInstanceState(outState);
+        title = outState.getString(STATE_TITLE);
     }
 
     public void setTitle(int titleId) {
         title = getString(titleId);
+        /** @fnp Case when we go back to home fragment */
+        if(getSupportActionBar() != null && getSupportActionBar().getTitle() != title) {
+            supportInvalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+        }
     }
 
     public void restoreActionBar() {
@@ -172,10 +234,34 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     @Override
     public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount()<2){
-            finish();
+        /**
+         * @fnp Changing the navigation behavior of the app. If navigation drawer is open, back
+         * button just closes it. If we have a backStack (BookDetails) we just pop that fragment.
+         * If not, we check if we are in our home fragment ("pre_startFragment"), if we are, we just
+         * call super.onBackPressed() (finish the app), if not, we go tou our home/start fragment
+         * (selectItem)
+         *
+         * This approach is the same used in the Gmail app
+         */
+
+        if(navigationDrawerFragment.isDrawerOpen()){
+            navigationDrawerFragment.closeDrawer();
+            return;
         }
-        super.onBackPressed();
+
+        if(getSupportFragmentManager().getBackStackEntryCount() > 0){
+            getSupportFragmentManager().popBackStack();
+            return;
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int position = Integer.parseInt(prefs.getString(getString(R.string.pref_start_fragment),"0"));
+
+        if(position == navigationDrawerFragment.getSelectedPosition()){
+            super.onBackPressed();
+        }else{
+            navigationDrawerFragment.selectItem(position);
+        }
     }
 
 
