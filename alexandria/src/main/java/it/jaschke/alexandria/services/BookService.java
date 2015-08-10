@@ -2,8 +2,10 @@ package it.jaschke.alexandria.services;
 
 import android.app.IntentService;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -90,6 +92,16 @@ public class BookService extends IntentService {
         }
 
         bookEntry.close();
+
+        /** @fnp checking connection (this is the bug noticed as: "It also crashed on me when I
+         * tried to add the book my sister was reading on the flight to London.”) */
+        if(!isConnected()){ //Aborting
+            Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
+            messageIntent.putExtra(MainActivity.MESSAGE_KEY, getResources()
+                    .getString(R.string.network_not_available));
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
+            return;
+        }
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -199,6 +211,15 @@ public class BookService extends IntentService {
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error ", e);
         }
+    }
+
+    /**
+     * @fnp function to check if we are connected into the network or not
+     * @return network state
+     */
+    public boolean isConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
     private void writeBackBook(String ean, String title, String subtitle, String desc, String imgUrl) {
