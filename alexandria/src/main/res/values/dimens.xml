@@ -4,6 +4,7 @@
     <integer name="ean_width">8</integer>
     <dimen name="head_line">24sp</dimen>
     <dimen name="small_fontsize">12sp</dimen>
+    <dimen name="default_padding">16dp</dimen>
 
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
