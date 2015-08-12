@@ -22,6 +22,9 @@ it just disappears!")
 ## Scores app
 - User correct season id for the API
 - Added Collection Widget for Today's Matches
+- Using unused string (specially inside Utility class)
+- Added missing contentDescriptions
+- Added supportsRtl (right-to-left)
 
 ## More (for both apps)
 - Deleted app-release.apk file

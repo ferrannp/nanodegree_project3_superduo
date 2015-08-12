@@ -7,6 +7,8 @@
         android:maxSdkVersion="22" />
 
     <application
+        android:name=".FootballScoresApp"
+        android:supportsRtl="true"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -27,7 +29,7 @@
 
         <activity
             android:name=".AboutActivity"
-            android:label="About"
+            android:label="@string/title_activity_about"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

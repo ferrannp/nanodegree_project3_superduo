@@ -128,8 +128,8 @@ public class myFetchService extends IntentService {
         //JSON data
         /** @fnp Use constants already defined on {@link barqsoft.footballscores.Utilies} */
         final String SERIE_A = String.valueOf(Utilies.SERIE_A);
-        final String PREMIER_LEGAUE = String.valueOf(Utilies.PREMIER_LEGAUE);
-        //final String CHAMPIONS_LEAGUE = "362";
+        final String PREMIER_LEGAUE = String.valueOf(Utilies.PREMIER_LEAGUE);
+        final String CHAMPIONS_LEAGUE = String.valueOf(Utilies.CHAMPIONS_LEAGUE);
         final String PRIMERA_DIVISION = String.valueOf(Utilies.PRIMERA_DIVISION);
         final String BUNDESLIGA = String.valueOf(Utilies.BUNDESLIGA);
 
@@ -170,11 +170,11 @@ public class myFetchService extends IntentService {
                 League = match_data.getJSONObject(LINKS).getJSONObject(SOCCER_SEASON).
                         getString("href");
                 League = League.replace(SEASON_LINK, "");
-                if (     /*League.equals(PREMIER_LEGAUE)      ||
+                if (    League.equals(PREMIER_LEGAUE)      ||
                         League.equals(SERIE_A)             ||
                         League.equals(CHAMPIONS_LEAGUE)    ||
                         League.equals(BUNDESLIGA)          ||
-                        League.equals(PRIMERA_DIVISION)     */true) {
+                        League.equals(PRIMERA_DIVISION)     ) {
                     match_id = match_data.getJSONObject(LINKS).getJSONObject(SELF).
                             getString("href");
                     match_id = match_id.replace(MATCH_LINK, "");
