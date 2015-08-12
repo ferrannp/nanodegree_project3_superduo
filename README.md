@@ -20,7 +20,8 @@ it just disappears!")
 (using [zxing-android-embedded](https://github.com/journeyapps/zxing-android-embedded))
 
 ## Scores app
--
+- User correct season id for the API
+- Added Collection Widget for Today's Matches
 
 ## More (for both apps)
 - Deleted app-release.apk file
