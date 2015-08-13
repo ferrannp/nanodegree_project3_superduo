@@ -26,6 +26,8 @@
     <string name="share_text">A must read book: </string>
     <string name="network_not_available">Network is not available.</string>
 
+    <string name="unknown_author">No Author found</string>
+
     <!-- Preferences -->
     <string name="pref_start_fragment" translatable="false">pref_startFragment</string>
 

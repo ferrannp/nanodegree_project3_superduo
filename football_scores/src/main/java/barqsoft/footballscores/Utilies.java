@@ -18,7 +18,7 @@ public class Utilies
     public static final int BUNDESLIGA = 394;
     public static String getLeague(int league_num)
     {
-        Context context = FootballScoresApp.getContext();
+        Context context = FootballScoresApp.mContext;
         switch (league_num)
         {
             case SERIE_A : return context.getString(R.string.seriaa);
@@ -31,7 +31,7 @@ public class Utilies
     }
     public static String getMatchDay(int match_day,int league_num)
     {
-        Context context = FootballScoresApp.getContext();
+        Context context = FootballScoresApp.mContext;
         if(league_num == CHAMPIONS_LEAGUE)
         {
             if (match_day <= 6)
